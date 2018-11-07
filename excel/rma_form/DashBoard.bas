@@ -14,25 +14,33 @@ Sub Initialize()
     Set tblRMA = wsDB.ListObjects("tableRMA")
     Set xmlRMA = New MSXML2.DOMDocument
     
+    'rmanumber text box get focused while the excel book opened.
     ActiveSheet.tRMANumber.Activate
     ActiveSheet.tRMANumber.Text = ""
 
     tblRMA.AutoFilter.ShowAllData
     
+    nStatus = 0
+
     bInitialized = True
     
 End Sub
 
 Function ParseInputs(txIn) As Integer
-
-    nStatus = 0
     
     If UCase(Left(txIn, 3)) = "RMA" Then
         nStatus = 1
+
+        If Len(txIn) = 14 & UCase(Left(txIn, 2)) = "PN" Then
+            nStatus = 4
+        End If
+
     ElseIf Left(txIn, 1) = "<" Then
         nStatus = 2
+    
     ElseIf Len(txIn) > 0 Then
         nStatus = 3
+        
     End If
     
     ParseInputs = nStatus

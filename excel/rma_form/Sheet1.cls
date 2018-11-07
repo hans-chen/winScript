@@ -36,17 +36,17 @@ End Sub
 Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
     If KeyCode = 13 Then
         Select Case nStatus
-            Case Is = 1
+            Case Is = 1                                     'Switch to RMA received updating mode, hide all customer's columns
                 wsDB.Range("C4:L4").Columns.Hidden = True
                 nStatus = 11
-            Case Is = 11
+            Case Is = 11                                    'Switch to RMA repaired updating mode, hide all cusotmer's and product's columns
                 wsDB.Range("C4:S4").Columns.Hidden = True
                 nStatus = 12
-            Case Is = 12
+            Case Is = 12                                    'Switch to RMA shipped back updating mode, hide all repairing's and product's columns
                 wsDB.Range("C4:L4").Columns.Hidden = False
                 wsDB.Range("M4:Y4").Columns.Hidden = True
                 nStatus = 13
-            Case Is = 13
+            Case Is = 13                                    'Show all columns and reset to RMA number working mode
                 wsDB.Range("A4:AA4").Columns.Hidden = False
                 nStatus = 1
                 
