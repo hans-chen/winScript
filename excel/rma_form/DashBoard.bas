@@ -30,11 +30,15 @@ Function ParseInputs(txIn) As Integer
     
     If UCase(Left(txIn, 3)) = "RMA" Then
         nStatus = 1
-
-        If Len(txIn) = 14 & UCase(Left(txIn, 2)) = "PN" Then
+        
+        If Len(txIn) = 13 And Right(txIn, 1) = " " Then     'enter command mode
+            nStatus = 5
+        ElseIf Len(txIn) > 12 And (UCase(Right(txIn, 2)) = "PN" Or UCase(Right(txIn, 2)) = "ST") Then    'part number command mode to update part number and status
             nStatus = 4
+        ElseIf Len(txIn) > 12 Then
+            nStatus = 99
         End If
-
+        
     ElseIf Left(txIn, 1) = "<" Then
         nStatus = 2
     
@@ -55,6 +59,9 @@ Sub SetFilter(nFilterColumn, txIn)
     End If
     
     Select Case nFilterColumn
+        Case Is = 0
+            tblRMA.AutoFilter.ShowAllData
+            
         Case Is = 1
             tblRMA.Range.AutoFilter Field:=1, Criteria1:="=" & txIn & "*"
             
@@ -63,4 +70,9 @@ Sub SetFilter(nFilterColumn, txIn)
             
     End Select
     
+End Sub
+
+Sub ResetView()
+    tblRMA.Range.Columns.Hidden = False
+    tblRMA.AutoFilter.ShowAllData
 End Sub

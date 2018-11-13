@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Private Sub tRMANumber_Change()
     If Len(tRMANumber.Text) > 3 Then
-        Select Case ParseInputs(Trim(tRMANumber.Text))
+        Select Case ParseInputs(tRMANumber.Text)
             Case Is = 1
                 SetFilter 1, tRMANumber.Text
             
@@ -19,8 +19,8 @@ Private Sub tRMANumber_Change()
                 SetFilter 16, tRMANumber.Text
                 
             Case Is = 5
-                SetFilter 1, tRMANumber.Text
-                tRMANumber.Text = tRMANumber.Text & ">"
+                SetFilter 1, Trim(tRMANumber.Text)              'filter based on rma number without space
+                tRMANumber.Text = Trim(tRMANumber.Text) & ">"   'change space to >
                 
             Case Is = 4     'dont change filter or hidden columns
             Case Is = 99
@@ -31,9 +31,7 @@ Private Sub tRMANumber_Change()
         End Select
         
     ElseIf tRMANumber.Text = "" Then
-        
-        tblRMA.AutoFilter.ShowAllData
-        SetFilter 0, ""
+        ResetView
     
     End If
     
@@ -106,7 +104,8 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
                 wsDB.Range("D4:K4").Columns.Hidden = True
                 
             Case Is = 4
-                tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(1, 2).Select
+                wsDB.Range("C4:L4").Columns.Hidden = True
+                tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(1, 15).Value = "123"
 
             Case Else
                 
