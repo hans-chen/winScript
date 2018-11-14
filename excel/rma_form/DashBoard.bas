@@ -6,6 +6,7 @@ Public xmlRMA As MSXML2.DOMDocument
 Public bInitialized As Boolean
 Public nStatus As Integer
 Public nFilter As Integer
+Public regX As RegExp
 
 Sub Initialize()
     
@@ -13,6 +14,7 @@ Sub Initialize()
     Set wsDB = wbRMA.Sheets(1)
     Set tblRMA = wsDB.ListObjects("tableRMA")
     Set xmlRMA = New MSXML2.DOMDocument
+    Set regX = New RegExp
     
     'rmanumber text box get focused while the excel book opened.
     ActiveSheet.tRMANumber.Activate
@@ -28,20 +30,19 @@ End Sub
 
 Function ParseInputs(txIn) As Integer
     
-    If UCase(Left(txIn, 3)) = "RMA" Then
+    If UCase(Left(txIn, 3)) = "RMA" And nStatus < 5 Then    'less than 5 = no commands mode anymore
         nStatus = 1
         
-        If Len(txIn) = 13 And Right(txIn, 1) = " " Then     'enter command mode
+        If Len(txIn) = 13 And Right(txIn, 1) = " " Then     'entering command mode, setup right filter and columns
             nStatus = 5
-        ElseIf Len(txIn) > 12 And (UCase(Right(txIn, 2)) = "PN" Or UCase(Right(txIn, 2)) = "ST") Then    'part number command mode to update part number and status
-            nStatus = 4
-        ElseIf Len(txIn) > 12 Then
-            nStatus = 99
         End If
         
     ElseIf Left(txIn, 1) = "<" Then
         nStatus = 2
     
+    ElseIf Len(txIn) > 12 And nStatus >= 5 Then    'part number command mode to update part number and status
+        nStatus = 6
+            
     ElseIf Len(txIn) > 0 Then
         nStatus = 3
         
