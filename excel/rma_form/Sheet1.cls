@@ -19,7 +19,6 @@ Private Sub tRMANumber_Change()
                 SetFilter 16, tRMANumber.Text
                 
             Case Is = 5
-                SetFilter 1, Trim(tRMANumber.Text)              'filter based on rma number without space
                 tRMANumber.Text = Trim(tRMANumber.Text) & ">"   'change space to >
                 
             Case Is = 6     'dont change filter or hidden columns
@@ -31,7 +30,12 @@ Private Sub tRMANumber_Change()
         End Select
         
     ElseIf tRMANumber.Text = "" Then
+        nStatus = 0
         ResetView
+        
+    ElseIf tRMANumber.Text = " " Then
+        nStatus = 6
+        tRMANumber.Text = ">"
     
     End If
     
@@ -39,6 +43,32 @@ End Sub
 
 
 Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    If KeyCode = 38 Then
+        Select Case nStatus
+        Case Is = 0
+            nRMALastNumber = wsDB.Range("CellNewRMANumber").Value2 - 1
+            tRMANumber.Text = "RMA" & nRMALastNumber
+        
+        Case Is = 1
+            n = CLng(Mid(tRMANumber.Text, 4, 6))
+            tRMANumber.Text = "RMA" & n - 1
+            
+        End Select
+    End If
+    
+    If KeyCode = 40 Then
+        Select Case nStatus
+        Case Is = 0
+            nRMALastNumber = wsDB.Range("CellNewRMANumber").Value2 + 1
+            tRMANumber.Text = "RMA" & nRMALastNumber
+        
+        Case Is = 1
+            n = CLng(Mid(tRMANumber.Text, 4, 6))
+            tRMANumber.Text = "RMA" & n + 1
+            
+        End Select
+    End If
+    
     If KeyCode = 13 Then
         Select Case nStatus
         Case Is = 1                                     'switch to RMA received updating mode, hide all customer's columns
@@ -68,7 +98,7 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
                 Err.Raise xmlRMA.parseError.ErrorCode, , xmlRMA.parseError.reason
             End If
 
-            Set listRMAItems = xmlRMA.SelectNodes("//RMA/RMAItem")
+            Set listRMAItems = xmlRMA.SelectNodes("//RMA/RMAItems/RMAItem")
             nNewRMAOffset = listRMAItems.Length - 1
             
             'add multiple lines common information of one rma request
@@ -94,11 +124,11 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
                 i = i + 1
             Next nodeRMA
             
-            tRMANumber.Text = ""
-            
             'update the cell has last rma number and last rma record row number
             wsDB.Range("CellNewRMANumber").Value = nNewRMANumber + 1
             wsDB.Range("CellNewRMARow").Value = nNewRMARow + i
+            
+            tRMANumber.Text = ""
 
         Case Is = 3                                     'serial number working mode
             wsDB.Range("D4:K4").Columns.Hidden = True
@@ -107,9 +137,7 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
             Dim mcCmd As MatchCollection
             Dim mCmd As Match
             
-            wsDB.Range("C4:L4").Columns.Hidden = True
-            
-            strcmd = Mid(tRMANumber.Text, 14)
+            strcmd = Mid(tRMANumber.Text, 2)
             With regX
                 .Global = True
                 .IgnoreCase = True
@@ -119,13 +147,20 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
             Set mcCmd = regX.Execute(strcmd)
             
             For Each mCmd In mcCmd
-                Select Case UCase(Left(mCmd.Value, 2))
+                Select Case UCase(mCmd.Value)
                 
                 Case Is = "PN"
                    tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(1, 15).Value = UCase(Mid(mCmd.Value, 3))
                 Case Is = "WR"
                    tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(1, 17).Value = UCase(Mid(mCmd.Value, 3))
-                   
+                Case Is = "REPORT"
+                    wbRMA.Sheets("CSV").Copy
+                    If Dir("\\freebsd\guest\rmareport.csv") <> "" Then
+                        Kill "\\freebsd\guest\rmareport.csv"
+                    End If
+                    ActiveWorkbook.SaveAs Filename:="\\freebsd\guest\rmareport.csv", FileFormat:=xlCSVMSDOS, CreateBackup:=False
+                    ActiveWorkbook.Close SaveChanges:=False
+                    
                 End Select
             Next
 

@@ -7,6 +7,8 @@ Public bInitialized As Boolean
 Public nStatus As Integer
 Public nFilter As Integer
 Public regX As RegExp
+Public nRMALastNumber
+
 
 Sub Initialize()
     
@@ -30,19 +32,17 @@ End Sub
 
 Function ParseInputs(txIn) As Integer
     
-    If UCase(Left(txIn, 3)) = "RMA" And nStatus < 5 Then    'less than 5 = no commands mode anymore
-        nStatus = 1
-        
-        If Len(txIn) = 13 And Right(txIn, 1) = " " Then     'entering command mode, setup right filter and columns
-            nStatus = 5
-        End If
-        
+    If nStatus > 5 Then
+    
     ElseIf Left(txIn, 1) = "<" Then
         nStatus = 2
-    
-    ElseIf Len(txIn) > 12 And nStatus >= 5 Then    'part number command mode to update part number and status
-        nStatus = 6
-            
+
+    ElseIf Right(txIn, 1) = " " Then     'entering command mode, setup right filter and columns
+       nStatus = 5
+
+    ElseIf UCase(Left(txIn, 3)) = "RMA" And nStatus < 5 Then    'less than 5 = no commands mode anymore
+        nStatus = 1
+      
     ElseIf Len(txIn) > 0 Then
         nStatus = 3
         
