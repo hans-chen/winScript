@@ -32,7 +32,7 @@ End Sub
 
 Function ParseInputs(txIn) As Integer
     
-    If nStatus > 5 Then
+    If nStatus >= 5 Then
     
     ElseIf Left(txIn, 1) = "<" Then
         nStatus = 2
@@ -77,3 +77,48 @@ Sub ResetView()
     tblRMA.Range.Columns.Hidden = False
     tblRMA.AutoFilter.ShowAllData
 End Sub
+
+Sub SendMailMessage(txNumber, txEmailAddr)
+    Dim OutApp As Outlook.Application
+    Dim objOutlookMsg As Outlook.MailItem
+    Dim objOutlookRecip As Recipient
+    Dim Recipients As Recipients
+    
+    Dim strFilename As String: strFilename = "\\freebsd\guest\email.html"
+    Dim strFilecontent, strEmail As String
+    Dim iFile As Integer: iFile = FreeFile
+    Open strFilename For Input As #iFile
+    strFilecontent = Input(LOF(iFile), iFile)
+    Close #iFile
+    
+    strEmail = Replace(strFilecontent, "+++RMANUMBER+++", txNumber)
+
+    Set OutApp = CreateObject("Outlook.Application")
+    Set objOutlookMsg = OutApp.CreateItem(olMailItem)
+    
+    Set Recipients = objOutlookMsg.Recipients
+    Set objOutlookRecip = Recipients.Add(txEmailAddr)
+    objOutlookRecip.Type = 1
+    
+    
+    
+    With objOutlookMsg
+        '.SentOnBehalfOfName = "Rick.Cranen@newland-id.com"
+        .Subject = "RMA Number: " & txNumber
+        .Attachments.Add "\\freebsd\guest\pics\newlandlogo.jpg", olByValue, 0
+        .HTMLBody = strEmail
+
+        'Resolve each Recipient's name.
+        For Each objOutlookRecip In objOutlookMsg.Recipients
+            objOutlookRecip.Resolve
+        Next
+        '.ReplyRecipients.Add "Rick.Cranen@newland-id.com"
+        '.Sender.Address = "Rick.Cranen@newland-id.com"
+        .display
+    End With
+    
+      'objOutlookMsg.Send
+    Set OutApp = Nothing
+
+End Sub
+

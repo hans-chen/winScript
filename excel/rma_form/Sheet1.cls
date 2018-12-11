@@ -19,6 +19,7 @@ Private Sub tRMANumber_Change()
                 SetFilter 16, tRMANumber.Text
                 
             Case Is = 5
+                nStatus = 6
                 tRMANumber.Text = Trim(tRMANumber.Text) & ">"   'change space to >
                 
             Case Is = 6     'dont change filter or hidden columns
@@ -72,17 +73,17 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
     If KeyCode = 13 Then
         Select Case nStatus
         Case Is = 1                                     'switch to RMA received updating mode, hide all customer's columns
-            wsDB.Range("C4:L4").Columns.Hidden = True
+            wsDB.Range("C4:M4").Columns.Hidden = True
             nStatus = 11
         Case Is = 11                                    'switch to RMA repaired updating mode, hide all cusotmer's and product's columns
-            wsDB.Range("C4:S4").Columns.Hidden = True
+            wsDB.Range("C4:T4").Columns.Hidden = True
             nStatus = 12
         Case Is = 12                                    'switch to RMA shipped back updating mode, hide all repairing's and product's columns
-            wsDB.Range("C4:L4").Columns.Hidden = False
-            wsDB.Range("M4:Y4").Columns.Hidden = True
+            wsDB.Range("C4:M4").Columns.Hidden = False
+            wsDB.Range("M4:Z4").Columns.Hidden = True
             nStatus = 13
         Case Is = 13                                    'show all columns and reset to RMA number working mode
-            wsDB.Range("A4:AA4").Columns.Hidden = False
+            wsDB.Range("A4:AB4").Columns.Hidden = False
             nStatus = 1
             
         Case Is = 2                                     'xml working mode to add new RMA items
@@ -108,18 +109,20 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
             wsDB.Range("F" & nNewRMARow & ":F" & nNewRMARow + nNewRMAOffset).Value = xmlRMA.SelectSingleNode("//RMA/Address2").nodeTypedValue
             wsDB.Range("G" & nNewRMARow & ":G" & nNewRMARow + nNewRMAOffset).Value = xmlRMA.SelectSingleNode("//RMA/City").nodeTypedValue
             wsDB.Range("H" & nNewRMARow & ":H" & nNewRMARow + nNewRMAOffset).Value = xmlRMA.SelectSingleNode("//RMA/PostCode").nodeTypedValue
-            wsDB.Range("I" & nNewRMARow & ":I" & nNewRMARow + nNewRMAOffset).Value = xmlRMA.SelectSingleNode("//RMA/PhoneNumber").nodeTypedValue
-            wsDB.Range("J" & nNewRMARow & ":J" & nNewRMARow + nNewRMAOffset).Value = xmlRMA.SelectSingleNode("//RMA/Email").nodeTypedValue
-            wsDB.Range("K" & nNewRMARow & ":K" & nNewRMARow + nNewRMAOffset).Value = xmlRMA.SelectSingleNode("//RMA/SpecialInstruction").nodeTypedValue
-            wsDB.Range("L" & nNewRMARow & ":L" & nNewRMARow + nNewRMAOffset).Value = Date
+            wsDB.Range("I" & nNewRMARow & ":I" & nNewRMARow + nNewRMAOffset).Value = xmlRMA.SelectSingleNode("//RMA/Country").nodeTypedValue
+            wsDB.Range("J" & nNewRMARow & ":J" & nNewRMARow + nNewRMAOffset).Value = xmlRMA.SelectSingleNode("//RMA/PhoneNumber").nodeTypedValue
+            wsDB.Range("K" & nNewRMARow & ":K" & nNewRMARow + nNewRMAOffset).Value = xmlRMA.SelectSingleNode("//RMA/Email").nodeTypedValue
+            wsDB.Range("L" & nNewRMARow & ":L" & nNewRMARow + nNewRMAOffset).Value = xmlRMA.SelectSingleNode("//RMA/SpecialInstruction").nodeTypedValue
+            wsDB.Range("M" & nNewRMARow & ":M" & nNewRMARow + nNewRMAOffset).Value = Date
             
             'add rma request information per rma item
             i = 0
             For Each nodeRMA In listRMAItems
                 wsDB.Range("A" & nNewRMARow + i).Value = "RMA" & nNewRMANumber & "-" & WorksheetFunction.Text(i, "00")
                 wsDB.Range("B" & nNewRMARow + i).Value = "RMA Requested Awaiting Arrival"
-                wsDB.Range("P" & nNewRMARow + i).Value = nodeRMA.SelectSingleNode("SerialNumber").nodeTypedValue
-                wsDB.Range("T" & nNewRMARow + i).Value = nodeRMA.SelectSingleNode("FaultDescription").nodeTypedValue
+                wsDB.Range("P" & nNewRMARow + i).Value = nodeRMA.SelectSingleNode("Product").nodeTypedValue
+                wsDB.Range("Q" & nNewRMARow + i).Value = nodeRMA.SelectSingleNode("SerialNumber").nodeTypedValue
+                wsDB.Range("U" & nNewRMARow + i).Value = nodeRMA.SelectSingleNode("FaultDescription").nodeTypedValue
                 
                 i = i + 1
             Next nodeRMA
@@ -137,11 +140,11 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
             Dim mcCmd As MatchCollection
             Dim mCmd As Match
             
-            strcmd = Mid(tRMANumber.Text, 2)
+            strcmd = tRMANumber.Text
             With regX
                 .Global = True
                 .IgnoreCase = True
-                .Pattern = "\S+"
+                .Pattern = "([^>| ]+)"
             End With
             
             Set mcCmd = regX.Execute(strcmd)
@@ -151,8 +154,10 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
                 
                 Case Is = "PN"
                    tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(1, 15).Value = UCase(Mid(mCmd.Value, 3))
+                   
                 Case Is = "WR"
                    tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(1, 17).Value = UCase(Mid(mCmd.Value, 3))
+                   
                 Case Is = "REPORT"
                     wbRMA.Sheets("CSV").Copy
                     If Dir("\\freebsd\guest\rmareport.csv") <> "" Then
@@ -160,6 +165,12 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
                     End If
                     ActiveWorkbook.SaveAs Filename:="\\freebsd\guest\rmareport.csv", FileFormat:=xlCSVMSDOS, CreateBackup:=False
                     ActiveWorkbook.Close SaveChanges:=False
+                    
+                Case Is = "EMAIL"
+                    tNumber = mcCmd.Item(0).Value                                                                               'get rma number from command
+                    tEmailReciept = tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(1, 11).Value        'get the email address from filtered data
+                    
+                    SendMailMessage tNumber, tEmailReciept
                     
                 End Select
             Next
