@@ -169,7 +169,7 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
                 Case Is = "EMAIL"
                     tNumber = mcCmd.Item(0).Value                                                                               'get rma number from command
                     tEmailReciept = tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(1, 11).Value        'get the email address from filtered data
-                    
+    
                     SendMailMessage tNumber, tEmailReciept
                     
                 End Select

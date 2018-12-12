@@ -18,6 +18,8 @@ Sub Initialize()
     Set xmlRMA = New MSXML2.DOMDocument
     Set regX = New RegExp
     
+    Worksheets("Dashboard").Activate
+    
     'rmanumber text box get focused while the excel book opened.
     ActiveSheet.tRMANumber.Activate
     ActiveSheet.tRMANumber.Text = ""
@@ -83,16 +85,15 @@ Sub SendMailMessage(txNumber, txEmailAddr)
     Dim objOutlookMsg As Outlook.MailItem
     Dim objOutlookRecip As Recipient
     Dim Recipients As Recipients
-    
     Dim strFilename As String: strFilename = "\\freebsd\guest\email.html"
-    Dim strFilecontent, strEmail As String
+    Dim strFilecontent, strEmail, strProducts, strSNs As String
     Dim iFile As Integer: iFile = FreeFile
+    Dim nCount As Integer
+    
     Open strFilename For Input As #iFile
     strFilecontent = Input(LOF(iFile), iFile)
     Close #iFile
     
-    strEmail = Replace(strFilecontent, "+++RMANUMBER+++", txNumber)
-
     Set OutApp = CreateObject("Outlook.Application")
     Set objOutlookMsg = OutApp.CreateItem(olMailItem)
     
@@ -100,12 +101,34 @@ Sub SendMailMessage(txNumber, txEmailAddr)
     Set objOutlookRecip = Recipients.Add(txEmailAddr)
     objOutlookRecip.Type = 1
     
+    nCount = tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Rows.Count
     
+    If nCount < 1 Then
+        Exit Sub
+    End If
+    
+    i = 1
+    strHTMLTableRow = "<tr><td valign=""top"" class=""mcnTextContent"" style=""padding-top: 0;padding-left: 18px;padding-bottom: 9px;" & _
+                    "padding-right: 18px;mso-line-height-rule: exactly;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;word-break: break-word;color: #202020;" & _
+                    "font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size: 16px;line-height: 150%;text-align: left;"">"
+    
+    Do While i <= nCount
+        strProducts = strProducts & strHTMLTableRow & tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(i, 16).Value & "</td></tr>"
+        strSNs = strSNs & strHTMLTableRow & tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(i, 17).Value & "</td></tr>"
+        
+        i = i + 1
+    Loop
+    
+    strEmail = Replace(strFilecontent, "+++Contact+++", tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(1, 4).Value)
+    strEmail = Replace(strEmail, "+++RMANUMBER+++", txNumber)
+    strEmail = Replace(strEmail, "+++RMAPRODUCTS+++", strProducts)
+    strEmail = Replace(strEmail, "+++RMASNS+++", strSNs)
     
     With objOutlookMsg
         '.SentOnBehalfOfName = "Rick.Cranen@newland-id.com"
         .Subject = "RMA Number: " & txNumber
-        .Attachments.Add "\\freebsd\guest\pics\newlandlogo.jpg", olByValue, 0
+        .Attachments.Add "\\freebsd\guest\pics\newlandlogobanner.jpg", olByValue, 0
+        .Attachments.Add "\\freebsd\guest\pics\linkedinbanner.jpg", olByValue, 0
         .HTMLBody = strEmail
 
         'Resolve each Recipient's name.
