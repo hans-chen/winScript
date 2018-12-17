@@ -113,8 +113,8 @@ Sub SendMailMessage(txNumber, txEmailAddr)
                     "font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size: 16px;line-height: 150%;text-align: left;"">"
     
     Do While i <= nCount
-        strProducts = strProducts & strHTMLTableRow & tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(i, 16).Value & "</td></tr>"
-        strSNs = strSNs & strHTMLTableRow & tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(i, 17).Value & "</td></tr>"
+        strProducts = strProducts & tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(i, 16).Value & "<br>"
+        strSNs = strSNs & tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(i, 17).Value & "<br>"
         
         i = i + 1
     Loop
@@ -126,9 +126,10 @@ Sub SendMailMessage(txNumber, txEmailAddr)
     
     With objOutlookMsg
         '.SentOnBehalfOfName = "Rick.Cranen@newland-id.com"
-        .Subject = "RMA Number: " & txNumber
+        .Subject = "Newland RMA - " & txNumber
         .Attachments.Add "\\freebsd\guest\pics\newlandlogobanner.jpg", olByValue, 0
         .Attachments.Add "\\freebsd\guest\pics\linkedinbanner.jpg", olByValue, 0
+        .Attachments.Add "\\freebsd\guest\pics\field_workforce.png", olByValue, 0
         .HTMLBody = strEmail
 
         'Resolve each Recipient's name.
