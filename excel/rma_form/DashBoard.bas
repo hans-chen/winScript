@@ -125,11 +125,12 @@ Sub SendMailMessage(txNumber, txEmailAddr)
     strEmail = Replace(strEmail, "+++RMASNS+++", strSNs)
     
     With objOutlookMsg
-        '.SentOnBehalfOfName = "Rick.Cranen@newland-id.com"
+        .SentOnBehalfOfName = "Service@newland-id.com"
         .Subject = "Newland RMA - " & txNumber
         .Attachments.Add "\\freebsd\guest\pics\newlandlogobanner.jpg", olByValue, 0
         .Attachments.Add "\\freebsd\guest\pics\linkedinbanner.jpg", olByValue, 0
         .Attachments.Add "\\freebsd\guest\pics\field_workforce.png", olByValue, 0
+        .Attachments.Add "\\freebsd\guest\pics\clickhere.png", olByValue, 0
         .HTMLBody = strEmail
 
         'Resolve each Recipient's name.
