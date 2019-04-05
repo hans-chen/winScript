@@ -80,15 +80,25 @@ Sub ResetView()
     tblRMA.AutoFilter.ShowAllData
 End Sub
 
-Sub SendMailMessage(txNumber, txEmailAddr)
+Sub SendMailMessage(txNumber, txEmailAddr, txType)
     Dim OutApp As Outlook.Application
     Dim objOutlookMsg As Outlook.MailItem
     Dim objOutlookRecip As Recipient
     Dim Recipients As Recipients
-    Dim strFilename As String: strFilename = "\\freebsd\guest\email.html"
+    Dim strFilename As String
     Dim strFilecontent, strEmail, strProducts, strSNs As String
     Dim iFile As Integer: iFile = FreeFile
     Dim nCount As Integer
+    
+    'templates location
+    Select Case UCase(txType)
+    Case Is = "RECEIPT"
+        strFilename = "\\freebsd\guest\email.html"
+        
+    Case Is = "COST"
+        strFilename = "\\freebsd\guest\cost.html"
+    
+    End Select
     
     Open strFilename For Input As #iFile
     strFilecontent = Input(LOF(iFile), iFile)

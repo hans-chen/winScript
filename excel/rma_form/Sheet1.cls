@@ -91,11 +91,13 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
             Dim nodeRMA As IXMLDOMNode
             Dim nNewRMANumber, nNewRMARow, nNewRMAOffset As Integer
             Dim i As Integer
-            
+            Dim strRawXML As String
+                        
             nNewRMANumber = wsDB.Range("CellNewRMANumber").Value
             nNewRMARow = wsDB.Range("CellNewRMARow").Value
+            strRawXML = Replace(tRMANumber.Text, "&", "and")
                             
-            If Not xmlRMA.LoadXML(tRMANumber.Text) Then
+            If Not xmlRMA.LoadXML(strRawXML) Then
                 Err.Raise xmlRMA.parseError.ErrorCode, , xmlRMA.parseError.reason
             End If
 
@@ -170,8 +172,14 @@ Private Sub tRMANumber_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
                     tNumber = mcCmd.Item(0).Value                                                                               'get rma number from command
                     tEmailReciept = tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(1, 11).Value        'get the email address from filtered data
     
-                    SendMailMessage tNumber, tEmailReciept
+                    SendMailMessage tNumber, tEmailReciept, "RECEIPT"
                     
+                Case Is = "COST"
+                    tNumber = mcCmd.Item(0).Value                                                                               'get rma number from command
+                    tEmailReciept = tblRMA.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Cells(1, 11).Value        'get the email address from filtered data
+    
+                    SendMailMessage tNumber, tEmailReciept, "COST"
+                        
                 End Select
             Next
 
