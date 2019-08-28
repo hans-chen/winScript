@@ -186,6 +186,21 @@ SecondShortcuts_CtrlM()
 ^p::	Send {Up}
 ^n::	Send {Down}
 
+;end of Outlook
+
+;start of Wechat
+
+#IfWinActive ahk_class WeChatMainWndForPC
+
+^e::	MouseClick, left, 290, 45							;search box
+^r::	MouseClick, left, 2470, 1245						;call
+
+;Moving focus
+^p::	Send {Up}
+^n::	Send {Down}
+
+;end of Wechat
+
 ;Mouse middle key for Creo and keyshot
 ;#IfWinActive, ahk_group 3DDESIGNWINDOWS
 
