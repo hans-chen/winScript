@@ -91,10 +91,19 @@ dev_CheckInfo()
 
 ;text editing cut/copy/paste
 ^k::	Send +{End}^x	;Shift+End then Ctrl+x
+!d::	Send ^+{Right}^x	;Shift+End then Ctrl+x
 
 ;text editing insert/add/delete
 ^o::	Send {Enter}{Up}{End}
 ^d::	Send {Delete}
+
+;Moving
+^p::	Send {Up}
+^n::	Send {Down}
+^b::	Send {Left}
+^f::	Send {Right}
+^a::	Send {Home}
+^e::	Send {End}
 
 ;Shortcuts for Outlook
 #IfWinActive ahk_class rctrl_renwnd32
@@ -182,22 +191,14 @@ SecondShortcuts_CtrlM()
 ^j::	SecondShortcuts_CtrlJ()								;Folders
 ^m::	SecondShortcuts_CtrlM()								;Editting & Search
 
-;Moving focus
-^p::	Send {Up}
-^n::	Send {Down}
-
 ;end of Outlook
 
 ;start of Wechat
 
 #IfWinActive ahk_class WeChatMainWndForPC
 
-^e::	MouseClick, left, 290, 45							;search box
+!q::	MouseClick, left, 290, 45							;search box
 ^r::	MouseClick, left, 2470, 1245						;call
-
-;Moving focus
-^p::	Send {Up}
-^n::	Send {Down}
 
 ;end of Wechat
 
