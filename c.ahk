@@ -6,38 +6,30 @@ global KEY_CTRL_S := 19
 
 ;group including windows ignore this ahk
 GroupAdd, IGNOREWINDOWS, ahk_class VanDyke Software - SecureCRT	;ignore shortcuts to SecureCRT
-GroupAdd, IGNOREWINDOWS, ahk_class Chrome_WidgetWin_1			;ignore shortcuts to Visual Studio Code
+GroupAdd, IGNOREWINDOWS, ahk_exe Code.exe						;ignore shortcuts to Visual Studio Code
 GroupAdd, IGNOREWINDOWS, ahk_class XLMAIN						;ignore shortcuts to Excel
+GroupAdd, IGNOREWINDOWS, ahk_class Emacs						;ignore shortcuts to Emacs
 
 ;group including 3D design windows need to redifine mouse middle click
 GroupAdd, 3DDESIGNWINDOWS, ahk_class HCS16139P
 GroupAdd, 3DDESIGNWINDOWS, ahk_class Qt5QWindowIcon
 
 ;Quick launch menu definition
-Menu, QuickRun, Add, &Everything, QuickRunMenuHandler
-Menu, QuickRun, Add, &Keyshot, QuickRunMenuHandler
-Menu, QuickRun, Add, C&reo, QuickRunMenuHandler
-Menu, QuickRun, Add, Easy&Set, QuickRunMenuHandler
-Menu, QuickRun, Add, Speed&Commander, QuickRunMenuHandler
+Menu, QuickRun, Add, &Emacs, QuickRunMenuHandler
+Menu, QuickRun, Add, Every&thing, QuickRunMenuHandler
 Menu, QuickRun, Add, &Visual Studio Code, QuickRunMenuHandler
-Menu, QuickRun, Add, &MindManager, QuickRunMenuHandler
+Menu, QuickRun, Add, E&xact, QuickRunMenuHandler
 return
 
 QuickRunMenuHandler:
-if (A_ThisMenuItem == "&Everything")
+if (A_ThisMenuItem == "Every&thing")
 	Run, % "C:\Program Files\Everything\Everything.exe", , Max
-else if (A_ThisMenuItem == "&Keyshot")
-	Run, % "C:\Program Files\KeyShot7\bin\keyshot.exe", % "D:\Docs\CAD\", Max
-else if (A_ThisMenuItem == "C&reo")
-	Run, % "C:\Program Files\PTC\Creo 5.0.0.0\Parametric\bin\parametric.exe", % "D:\Docs\CAD\", Max
-else if (A_ThisMenuItem == "Easy&Set")
-	Run, % "C:\Users\haiha\AppData\Local\EasySet\EasySet.exe"
-else if (A_ThisMenuItem == "Speed&Commander")
-	Run, % "D:\Docs\Tools\SpeedCommander\SpeedCommanderPortable.exe"
+else if (A_ThisMenuItem == "&Emacs")
+	Run, % "D:\Programs\Emacs\x86_64\bin\runemacs.exe", % "D:\Docs\org", Max
 else if (A_ThisMenuItem == "&Visual Studio Code")
 	Run, % "C:\Program Files\Microsoft VS Code\Code.exe"
-else if (A_ThisMenuItem == "&MindManager")
-	Run, % "C:\Program Files (x86)\Mindjet\MindManager 18\MindManager.exe"
+else if (A_ThisMenuItem == "E&xact")
+	Run, % "D:\Docs\Remote Desktop\Exact0.RDP"
 return
 
 ;Global keys
@@ -85,7 +77,7 @@ dev_CheckInfo()
 
 #IfWinNotActive, ahk_group IGNOREWINDOWS
 
-;roaming shortcuts 
+;emacs shortcuts
 
 #InputLevel 5			;higher input level
 
@@ -108,16 +100,6 @@ dev_CheckInfo()
 ;Shortcuts for Outlook
 #IfWinActive ahk_class rctrl_renwnd32
 
-TooltipDisplay(tips, timeout:=1000)
-{
-	ToolTip, % tips
-	SetTimer, ClearToolTip, % 0-timeout
-	return
-
-ClearToolTip:
-	ToolTip
-	return
-}
 
 SecondKeyInput()
 {
@@ -135,7 +117,7 @@ SecondKeyInput()
 
 SecondShortcuts_CtrlL()
 {
-	TooltipDisplay("L => Reply to all`nK => Reply`nJ => Forward`nCtrl-L => Catogorize Handled`nM => Catogorize Pending")
+	;TooltipDisplay("L => Reply to all`nK => Reply`nJ => Forward`nCtrl-L => Catogorize Handled`nM => Catogorize Pending")
 	key := SecondKeyInput()
 	if (key == "l")				 							;Reply to all
 		Send !hra
@@ -153,7 +135,7 @@ SecondShortcuts_CtrlL()
 
 SecondShortcuts_CtrlJ()
 {
-	TooltipDisplay("L => Inbox`nJ => To be vetted`nK => Sent`nM => Follow`nN => Pending")
+	;TooltipDisplay("L => Inbox`nJ => To be vetted`nK => Sent`nM => Follow`nN => Pending")
 	key := SecondKeyInput()
 	if (key == "l")				 							;Jump to Inbox
 		Send ^+{Tab}hp{Enter}
@@ -171,7 +153,7 @@ SecondShortcuts_CtrlJ()
 
 SecondShortcuts_CtrlM()
 {
-	TooltipDisplay("K => Signature 1 side window`nL => Signature 1 popup window`nJ => HTML`nM => Search From`nN => Search To")
+	;TooltipDisplay("K => Signature 1 side window`nL => Signature 1 popup window`nJ => HTML`nM => Search From`nN => Search To")
 	key := SecondKeyInput()
 	if (key == "l")				 							;Select first signature in popup editing window
 		Send !has{Enter}
@@ -193,14 +175,48 @@ SecondShortcuts_CtrlM()
 
 ;end of Outlook
 
-;start of Wechat
-
+;;;start of Wechat
 #IfWinActive ahk_class WeChatMainWndForPC
 
-!q::	MouseClick, left, 290, 45							;search box
-^r::	MouseClick, left, 2470, 1245						;call
+!q::	MouseClick, left, 200, 45							;search box position, (x,y)
+^r::														;call or pick up call
+Send +{Tab}{Right 4}{Enter}	
+MouseClick, left, 2530, 1350
 
-;end of Wechat
+#IfWinActive ahk_class AudioWnd
+
+^h::	Send {Tab 5}{Enter}									;hang up call
+
+#IfWinActive ahk_class VoipTrayWnd
+
+^r::	Send {Tab 2}{Enter}									;pick up call
+
+;;;end of Wechat
+
+;;;start of Wework
+#IfWinActive ahk_class WeWorkWindow
+
+!q::	MouseClick, left, 200, 45							;search box position, (x,y)
+^r::	MouseClick, left, 660, 1227							;call
+
+;;;end of Wework
+
+;;;start of Skype
+#IfWinActive ahk_exe Skype.exe
+
+!q::	Send ^+s											;search box
+^r::	Send ^+p											;call or pick up call
+^h::	Send ^+h											;hand up call
+
+;;;end of Skype
+
+;;;start of Chrome
+#IfWinActive ahk_exe chrome.exe
+
+!q::	Send {F6}											;search and address bar
+^s::	Send {F3}											;search in page
+
+;;;end of Chrome
 
 ;Mouse middle key for Creo and keyshot
 ;#IfWinActive, ahk_group 3DDESIGNWINDOWS
