@@ -2,6 +2,7 @@
 global KEY_CTRL_C := 3
 global KEY_CTRL_K := 11
 global KEY_CTRL_L := 12
+global KEY_CTRL_M := 13
 global KEY_CTRL_S := 19
 
 ;group including windows ignore this ahk
@@ -9,6 +10,7 @@ GroupAdd, IGNOREWINDOWS, ahk_class VanDyke Software - SecureCRT	;ignore shortcut
 GroupAdd, IGNOREWINDOWS, ahk_exe Code.exe						;ignore shortcuts to Visual Studio Code
 GroupAdd, IGNOREWINDOWS, ahk_class XLMAIN						;ignore shortcuts to Excel
 GroupAdd, IGNOREWINDOWS, ahk_class Emacs						;ignore shortcuts to Emacs
+GroupAdd, IGNOREWINDOWS, ahk_exe pycharm64.exe					;ignore shortcuts to Visual Studio Code
 
 ;group including 3D design windows need to redifine mouse middle click
 GroupAdd, 3DDESIGNWINDOWS, ahk_class HCS16139P
@@ -100,7 +102,6 @@ dev_CheckInfo()
 ;Shortcuts for Outlook
 #IfWinActive ahk_class rctrl_renwnd32
 
-
 SecondKeyInput()
 {
 	Suspend, On
@@ -137,16 +138,14 @@ SecondShortcuts_CtrlJ()
 {
 	;TooltipDisplay("L => Inbox`nJ => To be vetted`nK => Sent`nM => Follow`nN => Pending")
 	key := SecondKeyInput()
-	if (key == "l")				 							;Jump to Inbox
-		Send ^+{Tab}hp{Enter}
+	if (key == "k")				 							;Jump to Inbox
+		Send ^+{Tab}hi{Enter}
 	else if (key == "j")				 					;Jump to To be vetted
 		Send ^+{Tab}hg1{Enter}
-	else if (key == "k")									;Jump to Sent
-		Send ^+{Tab}hv{Enter}
-	else if (key == "m")									;Jump to Follow
+	else if (key == "s")									;Jump to Sent
+		Send ^+{Tab}hs{Enter}
+	else if (key == "l")									;Jump to Follow
 		Send ^+{Tab}hg2{Enter}
-	else if (key == "n")									;Jump to Pending
-		Send ^+{Tab}hg3{Enter}
 
 	return
 }
@@ -161,10 +160,8 @@ SecondShortcuts_CtrlM()
 		Send !oth
 	else if (key == "k")									;Select first signature in side editing window
 		Send !e2as{Enter}
-	else if (key == "m")									;Jump to Search From
-		Send ^e{Tab 3}
-	else if (key == "n")									;Jump to Search To
-		Send ^e{Tab 5}
+	else if (key == KEY_CTRL_M)								;Jump to Search
+		Send !q1
 
 	return
 }
@@ -181,7 +178,6 @@ SecondShortcuts_CtrlM()
 !q::	MouseClick, left, 200, 45							;search box position, (x,y)
 ^r::														;call or pick up call
 Send +{Tab}{Right 4}{Enter}	
-MouseClick, left, 2530, 1350
 
 #IfWinActive ahk_class AudioWnd
 
@@ -189,7 +185,7 @@ MouseClick, left, 2530, 1350
 
 #IfWinActive ahk_class VoipTrayWnd
 
-^r::	Send {Tab 2}{Enter}									;pick up call
+^r::	Send {Tab 3}{Enter}									;pick up call
 
 ;;;end of Wechat
 
@@ -197,7 +193,7 @@ MouseClick, left, 2530, 1350
 #IfWinActive ahk_class WeWorkWindow
 
 !q::	MouseClick, left, 200, 45							;search box position, (x,y)
-^r::	MouseClick, left, 660, 1227							;call
+^r::	MouseClick, left, 725, 1227							;call
 
 ;;;end of Wework
 
