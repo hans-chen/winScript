@@ -197,14 +197,12 @@ Send +{Tab}{Right 4}{Enter}
 
 ;;;end of Wework
 
-;;;start of Skype
-#IfWinActive ahk_exe Skype.exe
+;;;start of Teams
+#IfWinActive ahk_exe Teams.exe
 
-!q::	Send ^+s											;search box
-^r::	Send ^+p											;call or pick up call
-^h::	Send ^+h											;hand up call
+!q::	Send ^e												;search box
 
-;;;end of Skype
+;;;end of Teams
 
 ;;;start of Chrome
 #IfWinActive ahk_exe chrome.exe
