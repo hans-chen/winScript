@@ -11,6 +11,7 @@ GroupAdd, IGNOREWINDOWS, ahk_exe Code.exe						;ignore shortcuts to Visual Studi
 GroupAdd, IGNOREWINDOWS, ahk_class XLMAIN						;ignore shortcuts to Excel
 GroupAdd, IGNOREWINDOWS, ahk_class Emacs						;ignore shortcuts to Emacs
 GroupAdd, IGNOREWINDOWS, ahk_exe pycharm64.exe					;ignore shortcuts to Visual Studio Code
+GroupAdd, IGNOREWINDOWS, ahk_exe  Teams.exe						;ignore shortcuts to Visual Studio Code
 
 ;group including 3D design windows need to redifine mouse middle click
 GroupAdd, 3DDESIGNWINDOWS, ahk_class HCS16139P
@@ -201,6 +202,15 @@ Send +{Tab}{Right 4}{Enter}
 #IfWinActive ahk_exe Teams.exe
 
 !q::	Send ^e												;search box
+
+;Moving
+^p::	Send !{Up}
+^n::	Send !{Down}
+^a::	Send {Home}
+^e::	Send {End}
+^k::	Send +{End}^x	;Shift+End then Ctrl+x
+^b::	Send {Left}
+^f::	Send {Right}
 
 ;;;end of Teams
 
