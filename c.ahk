@@ -200,6 +200,7 @@ Send +{Tab}{Right 4}{Enter}
 
 ;;;start of Teams
 #IfWinActive ahk_exe Teams.exe
+#IfWinActive ahk_exe ms-teams.exe
 
 !q::	Send ^e												;search box
 
